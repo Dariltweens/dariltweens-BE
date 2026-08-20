@@ -1,0 +1,71 @@
+
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: fish
+      POSTGRES_PASSWORD: fish
+      POSTGRES_DB: fish_be
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fish -d fish_be"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build: .
+    # Run migrations, then serve. --reload for dev; drop it to mirror prod.
+    command: >
+      sh -c "python manage.py migrate --noinput &&
+             gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3 --reload"
+    environment:
+      DEBUG: "True"
+      SECRET_KEY: dev-insecure-key-change-me
+      ALLOWED_HOSTS: "localhost,127.0.0.1,0.0.0.0,web"
+      DATABASE_URL: postgres://fish:fish@db:5432/fish_be
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+    volumes:
+      - .:/app          # live code reload in dev
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  worker:
+    build: .
+    command: celery -A config worker -l info
+    environment:
+      DEBUG: "True"
+      SECRET_KEY: dev-insecure-key-change-me
+      DATABASE_URL: postgres://fish:fish@db:5432/fish_be
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+    volumes:
+      - .:/app
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  pgdata:
