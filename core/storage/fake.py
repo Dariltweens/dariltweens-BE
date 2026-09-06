@@ -10,7 +10,9 @@ from typing import BinaryIO
 class FakeStorage:
     """In-memory implementation of the StorageClient protocol."""
 
-    def __init__(self, base_url: str = "memory://") -> None:
+    # https-style base so derived URLs behave like a real CDN (e.g. redirects
+    # to them pass Django's scheme checks), while staying entirely in-memory.
+    def __init__(self, base_url: str = "https://fake-storage.local/") -> None:
         self._base_url = base_url
         self._objects: dict[str, bytes] = {}
 

@@ -35,6 +35,11 @@ INSTALLED_APPS = [
     "bookings",
     "content",
     "uploads",
+    "customers",
+    "testimonials",
+    "careers",
+    "pricelist",
+    "enquiries",
 ]
 
 MIDDLEWARE = [
@@ -107,6 +112,11 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Locked down by default: every endpoint requires admin unless it explicitly
 # opts into AllowAny. Public endpoints must set their own throttles.
 REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        # JWT for customer accounts; session keeps Django admin + browsable API.
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+    ],
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAdminUser",
     ],
@@ -142,3 +152,22 @@ R2_CONFIG = {
 CELERY_BROKER_URL = env("CELERY_BROKER_URL", default="redis://localhost:6379/0")
 CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND", default="redis://localhost:6379/1")
 CELERY_TASK_ALWAYS_EAGER = env.bool("CELERY_TASK_ALWAYS_EAGER", default=False)
+
+# --- Email -----------------------------------------------------------------
+# Console backend by default so dev/CI never send real mail; set EMAIL_BACKEND to
+# the SMTP backend with the EMAIL_* vars in production (Railway env).
+EMAIL_BACKEND = env(
+    "EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend"
+)
+EMAIL_HOST = env("EMAIL_HOST", default="")
+EMAIL_PORT = env.int("EMAIL_PORT", default=587)
+EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")
+EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="no-reply@dnl.local")
+
+# Inbox routing — where each notification type is delivered (see core.notifications).
+DNL_ORDER_INBOX = env("DNL_ORDER_INBOX", default="orders@dnl.local")
+DNL_GENERAL_INBOX = env("DNL_GENERAL_INBOX", default="info@dnl.local")
+DNL_CAREERS_INBOX = env("DNL_CAREERS_INBOX", default="careers@dnl.local")
+DNL_ADMIN_INBOX = env("DNL_ADMIN_INBOX", default="admin@dnl.local")

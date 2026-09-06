@@ -27,7 +27,8 @@ PICKUP = timezone.now().date() + timedelta(days=2)
 @pytest.mark.django_db
 def test_create_booking_decrements_stock_and_is_pending():
     product = ProductFactory(stock_quantity=10)
-    booking = create_booking(product_id=product.id, quantity=4, pickup_date=PICKUP)
+    booking = create_booking(product_id=product.id, quantity=4, pickup_date=PICKUP,
+                              email="guest@example.com", name="Guest")
 
     product.refresh_from_db()
     assert booking.status == BookingStatus.PENDING
@@ -39,7 +40,8 @@ def test_create_booking_decrements_stock_and_is_pending():
 @pytest.mark.django_db
 def test_create_booking_allows_exact_remaining_stock():
     product = ProductFactory(stock_quantity=5)
-    create_booking(product_id=product.id, quantity=5, pickup_date=PICKUP)
+    create_booking(product_id=product.id, quantity=5, pickup_date=PICKUP,
+                   email="guest@example.com", name="Guest")
     product.refresh_from_db()
     assert product.stock_quantity == 0
 
@@ -49,7 +51,8 @@ def test_create_booking_allows_exact_remaining_stock():
 def test_create_booking_rejects_over_available_and_leaves_stock_untouched():
     product = ProductFactory(stock_quantity=3)
     with pytest.raises(InsufficientStock):
-        create_booking(product_id=product.id, quantity=4, pickup_date=PICKUP)
+        create_booking(product_id=product.id, quantity=4, pickup_date=PICKUP,
+                              email="guest@example.com", name="Guest")
 
     product.refresh_from_db()
     assert product.stock_quantity == 3
@@ -75,7 +78,8 @@ def test_concurrent_bookings_do_not_oversell():
     def attempt():
         barrier.wait()  # maximise contention
         try:
-            create_booking(product_id=product.id, quantity=1, pickup_date=PICKUP)
+            create_booking(product_id=product.id, quantity=1, pickup_date=PICKUP,
+                           email="guest@example.com", name="Guest")
             results.append("ok")
         except InsufficientStock:
             results.append("rejected")

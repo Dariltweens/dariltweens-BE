@@ -8,23 +8,61 @@ pattern so a cancellation reliably releases reserved stock.
 
 from datetime import date
 
+from django.conf import settings
 from django.db import transaction
 
 from bookings.enums import ALLOWED_TRANSITIONS, BookingStatus
 from bookings.exceptions import InsufficientStock, InvalidTransition
 from bookings.models import Booking
 from catalog.models import Product
+from core.notifications import enqueue_email
+from customers.models import Customer
+from customers.services import match_or_create_customer
+
+
+def _order_notification_body(booking: Booking) -> str:
+    """Plain-text summary of a new booking for DNL's order inbox."""
+    customer = booking.customer
+    tag = "returning customer" if customer.is_returning else "new customer"
+    return (
+        f"New booking #{booking.pk} ({tag})\n\n"
+        f"Product: {booking.product.name}\n"
+        f"Quantity: {booking.quantity}\n"
+        f"Pickup date: {booking.pickup_date}\n"
+        f"Delivery location: {booking.delivery_location or '—'}\n\n"
+        f"Customer: {customer.name}\n"
+        f"Email: {customer.email or '—'}\n"
+        f"Phone: {customer.phone or '—'}\n"
+    )
 
 
 @transaction.atomic
-def create_booking(*, product_id: int, quantity: int, pickup_date: date) -> Booking:
+def create_booking(
+    *,
+    product_id: int,
+    quantity: int,
+    pickup_date: date,
+    customer: Customer | None = None,
+    name: str = "",
+    email: str = "",
+    phone: str = "",
+    delivery_location: str = "",
+) -> Booking:
     """Reserve stock and create a pending booking, or raise.
 
     The product row is locked for the duration of the transaction so concurrent
-    reservations serialise and cannot oversell.
+    reservations serialise and cannot oversell. The booking is attached to
+    ``customer`` when provided (logged-in path); otherwise the contact details are
+    matched to an existing customer or a new one is created (guest path). DNL is
+    notified by email once the transaction commits.
     """
     if quantity <= 0:
         raise ValueError("quantity must be positive.")
+
+    if customer is None:
+        customer, _created = match_or_create_customer(
+            name=name, email=email, phone=phone
+        )
 
     product = Product.objects.select_for_update().get(pk=product_id)
     if quantity > product.stock_quantity:
@@ -35,12 +73,21 @@ def create_booking(*, product_id: int, quantity: int, pickup_date: date) -> Book
     product.stock_quantity -= quantity
     product.save(update_fields=["stock_quantity", "updated_at"])
 
-    return Booking.objects.create(
+    booking = Booking.objects.create(
         product=product,
+        customer=customer,
         quantity=quantity,
         pickup_date=pickup_date,
+        delivery_location=delivery_location,
         status=BookingStatus.PENDING,
     )
+
+    enqueue_email(
+        subject=f"New booking #{booking.pk} — {product.name}",
+        body=_order_notification_body(booking),
+        recipients=[settings.DNL_ORDER_INBOX],
+    )
+    return booking
 
 
 @transaction.atomic

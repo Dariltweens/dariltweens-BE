@@ -18,8 +18,18 @@ class Booking(models.Model):
         related_name="bookings",
         db_index=True,
     )
+    # PROTECT: a customer with booking history must not be deletable.
+    customer = models.ForeignKey(
+        "customers.Customer",
+        on_delete=models.PROTECT,
+        related_name="bookings",
+        db_index=True,
+    )
     quantity = models.PositiveIntegerField()
     pickup_date = models.DateField()
+    delivery_location = models.CharField(max_length=255, blank=True, default="")
+    # Internal, admin-only note; never exposed on the public create/read path.
+    notes = models.TextField(blank=True, default="")
     status = models.CharField(
         max_length=20,
         choices=BookingStatus.choices,

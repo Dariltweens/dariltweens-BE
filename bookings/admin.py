@@ -15,11 +15,13 @@ from bookings.services import transition_booking
 
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):
-    list_display = ["id", "product", "quantity", "pickup_date", "status", "created_at"]
+    list_display = [
+        "id", "product", "customer", "quantity", "pickup_date", "status", "created_at"
+    ]
     list_filter = ["status", "pickup_date"]
-    search_fields = ["product__name"]
-    autocomplete_fields = ["product"]
-    list_select_related = ["product"]
+    search_fields = ["product__name", "customer__name", "customer__email"]
+    autocomplete_fields = ["product", "customer"]
+    list_select_related = ["product", "customer"]
     readonly_fields = ["created_at", "updated_at"]
 
     def save_model(self, request, obj, form, change):

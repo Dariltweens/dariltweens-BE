@@ -9,4 +9,9 @@ urlpatterns = [
     path("api/", include("bookings.urls")),
     path("api/", include("content.urls")),
     path("api/", include("uploads.urls")),
+    path("api/", include("customers.urls")),
+    path("api/", include("testimonials.urls")),
+    path("api/", include("careers.urls")),
+    path("api/", include("pricelist.urls")),
+    path("api/", include("enquiries.urls")),
 ]

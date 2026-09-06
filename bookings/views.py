@@ -11,9 +11,9 @@ from rest_framework.permissions import AllowAny, IsAdminUser
 
 from bookings.models import Booking
 from bookings.serializers import (
+    BookingAdminUpdateSerializer,
     BookingCreateSerializer,
     BookingReadSerializer,
-    BookingStatusSerializer,
 )
 
 
@@ -24,7 +24,7 @@ class BookingViewSet(
     mixins.UpdateModelMixin,  # PATCH only (see http_method_names)
     viewsets.GenericViewSet,
 ):
-    queryset = Booking.objects.select_related("product").all()
+    queryset = Booking.objects.select_related("product", "customer").all()
     http_method_names = ["get", "post", "patch", "head", "options"]
 
     def get_permissions(self):
@@ -37,5 +37,5 @@ class BookingViewSet(
         if self.action == "create":
             return BookingCreateSerializer
         if self.action == "partial_update":
-            return BookingStatusSerializer
+            return BookingAdminUpdateSerializer
         return BookingReadSerializer

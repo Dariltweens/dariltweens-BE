@@ -23,7 +23,10 @@ pytestmark = [pytest.mark.integration, pytest.mark.django_db]
 
 def _make_pending(stock=10, qty=2):
     product = ProductFactory(stock_quantity=stock)
-    booking = create_booking(product_id=product.id, quantity=qty, pickup_date=PICKUP)
+    booking = create_booking(
+        product_id=product.id, quantity=qty, pickup_date=PICKUP,
+        email="guest@example.com", name="Guest",
+    )
     return product, booking
 
 
