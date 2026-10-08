@@ -38,9 +38,7 @@ class RegisterSerializer(serializers.Serializer):
 
     def validate(self, attrs: dict) -> dict:
         if not attrs.get("email") and not attrs.get("phone"):
-            raise serializers.ValidationError(
-                "Provide an email or a phone number."
-            )
+            raise serializers.ValidationError("Provide an email or a phone number.")
         return attrs
 
     def create(self, validated_data: dict) -> Customer:

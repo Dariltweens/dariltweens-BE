@@ -9,3 +9,6 @@ htmlcov/
 media/
 staticfiles/
 .DS_Store
+CLAUDE.md
+dnl_website_scope.md
+DNL_Website_Scope_of_Work_v2.docks

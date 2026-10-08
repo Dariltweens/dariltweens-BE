@@ -8,6 +8,7 @@ BookingAdminUpdateSerializer is the admin-only status/notes path.
 
 from django.utils import timezone
 from rest_framework import serializers
+from drf_spectacular.utils import extend_schema_serializer, OpenApiExample
 
 from bookings.enums import ALLOWED_TRANSITIONS
 from bookings.exceptions import InsufficientStock, InvalidTransition
@@ -45,6 +46,31 @@ class BookingReadSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
 
+@extend_schema_serializer(
+    examples=[
+        OpenApiExample(
+            "Guest Booking Request Example",
+            value={
+                "product": 1,
+                "quantity": 2,
+                "pickup_date": "2026-10-15",
+                "delivery_location": "DNL Pickup Point A",
+                "name": "Jane Miller",
+                "email": "jane.miller@example.com",
+                "phone": "+1987654321",
+            },
+        ),
+        OpenApiExample(
+            "Customer Booking Request Example",
+            value={
+                "product": 1,
+                "quantity": 5,
+                "pickup_date": "2026-10-15",
+                "delivery_location": "DNL Pickup Point B",
+            },
+        ),
+    ]
+)
 class BookingCreateSerializer(serializers.ModelSerializer):
     # Guest contact details (write-only). Ignored when the requester is a
     # logged-in customer, whose account is used instead.

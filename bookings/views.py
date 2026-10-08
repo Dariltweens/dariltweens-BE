@@ -8,6 +8,7 @@ validated state machine via PATCH.
 
 from rest_framework import mixins, viewsets
 from rest_framework.permissions import AllowAny, IsAdminUser
+from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from bookings.models import Booking
 from bookings.serializers import (
@@ -17,6 +18,34 @@ from bookings.serializers import (
 )
 
 
+@extend_schema_view(
+    create=extend_schema(
+        summary="Create a new booking",
+        description="Public endpoint to submit a booking. Atomically reserves stock inside a transaction using SELECT FOR UPDATE to prevent overselling.",
+        request=BookingCreateSerializer,
+        responses={201: BookingReadSerializer},
+        tags=["Public - Bookings"],
+    ),
+    list=extend_schema(
+        summary="List all bookings",
+        description="Retrieve a list of all customer bookings, including nested product and customer details. (Admin-only)",
+        responses={200: BookingReadSerializer(many=True)},
+        tags=["Admin - Bookings"],
+    ),
+    retrieve=extend_schema(
+        summary="Retrieve a booking",
+        description="Retrieve detailed information about a single booking by ID. (Admin-only)",
+        responses={200: BookingReadSerializer},
+        tags=["Admin - Bookings"],
+    ),
+    partial_update=extend_schema(
+        summary="Transition booking status (PATCH)",
+        description="Transition the status of a booking. Transitions are validated (e.g., PENDING -> CONFIRMED -> FULFILLED). (Admin-only)",
+        request=BookingAdminUpdateSerializer,
+        responses={200: BookingReadSerializer},
+        tags=["Admin - Bookings"],
+    ),
+)
 class BookingViewSet(
     mixins.CreateModelMixin,
     mixins.RetrieveModelMixin,

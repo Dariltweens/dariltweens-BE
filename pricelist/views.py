@@ -11,12 +11,40 @@ from rest_framework import mixins, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.response import Response
+from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from core.storage import get_storage
 from pricelist.models import PriceList
 from pricelist.serializers import PriceListSerializer, PriceListUploadSerializer
 
 
+@extend_schema_view(
+    create=extend_schema(
+        summary="Upload a new price list",
+        description="Upload a new PDF price list. The uploaded file is stored in Cloud Storage and marked as the active price list. (Admin-only)",
+        request=PriceListUploadSerializer,
+        responses={201: PriceListSerializer},
+        tags=["Admin - Price List"],
+    ),
+    list=extend_schema(
+        summary="List price list upload history",
+        description="Retrieve a complete history of uploaded price lists, including the user who uploaded them. (Admin-only)",
+        responses={200: PriceListSerializer(many=True)},
+        tags=["Admin - Price List"],
+    ),
+    current=extend_schema(
+        summary="Get current price list metadata",
+        description="Public endpoint to retrieve metadata for the currently active price list (including public URL, filename, and last-updated time).",
+        responses={200: PriceListSerializer},
+        tags=["Public - Price List"],
+    ),
+    download=extend_schema(
+        summary="Download current price list PDF",
+        description="Public endpoint that redirects to the active price list file in object storage (CDN) for direct downloading.",
+        responses={302: None},
+        tags=["Public - Price List"],
+    ),
+)
 class PriceListViewSet(
     mixins.CreateModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet
 ):
