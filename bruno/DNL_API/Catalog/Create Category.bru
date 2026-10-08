@@ -1,0 +1,51 @@
+meta {
+  name: Create Category
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{base_url}}/api/categories/
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Token {{admin_token}}
+}
+
+body:json {
+  {
+    "name": "Fresh Fish",
+    "slug": "fresh-fish",
+    "field_schema": {
+      "version": 1,
+      "fields": [
+        {
+          "name": "freshness",
+          "type": "string",
+          "required": true,
+          "choices": ["fresh", "frozen"]
+        },
+        {
+          "name": "size_range",
+          "type": "string",
+          "required": false,
+          "choices": ["S", "M", "L", "XL"]
+        },
+        {
+          "name": "weight",
+          "type": "number",
+          "required": false,
+          "min": 0,
+          "max": 100
+        },
+        {
+          "name": "wild_caught",
+          "type": "boolean",
+          "required": false
+        }
+      ]
+    }
+  }
+}

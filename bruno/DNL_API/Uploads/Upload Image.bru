@@ -1,0 +1,20 @@
+meta {
+  name: Upload Image
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{base_url}}/api/images/
+  body: multipartForm
+  auth: inherit
+}
+
+headers {
+  Authorization: Token {{admin_token}}
+}
+
+body:multipart-form {
+  file: @file(salmon.jpg)
+  product_id: 1
+}

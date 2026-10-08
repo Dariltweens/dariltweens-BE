@@ -1,0 +1,23 @@
+meta {
+  name: Create Booking
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{base_url}}/api/bookings/
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "product_id": 1,
+    "quantity": 2,
+    "pickup_date": "2026-10-15",
+    "customer_name": "John Doe",
+    "customer_email": "john.doe@example.com",
+    "customer_phone": "+1234567890",
+    "delivery_location": "DNL Pickup Point A"
+  }
+}

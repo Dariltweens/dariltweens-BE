@@ -1,0 +1,19 @@
+meta {
+  name: Upload PriceList
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{base_url}}/api/pricelist/
+  body: multipartForm
+  auth: inherit
+}
+
+headers {
+  Authorization: Token {{admin_token}}
+}
+
+body:multipart-form {
+  file: @file(DNL_Price_List_October.pdf)
+}

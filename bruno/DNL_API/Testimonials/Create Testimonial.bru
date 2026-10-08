@@ -1,0 +1,20 @@
+meta {
+  name: Create Testimonial
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{base_url}}/api/testimonials/
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "customer_name": "Arthur Pendragon",
+    "company_name": "Camelot Seafoods",
+    "content": "The fish is incredibly fresh, and the delivery schedules are extremely consistent!",
+    "rating": 5
+  }
+}

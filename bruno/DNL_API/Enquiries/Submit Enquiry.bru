@@ -1,0 +1,21 @@
+meta {
+  name: Submit Enquiry
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{base_url}}/api/enquiries/
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Jane Miller",
+    "email": "jane.miller@example.com",
+    "phone": "+1987654321",
+    "subject": "Bulk fish pricing enquiry",
+    "message": "Hi, I am looking to purchase fresh fish in bulk on a weekly basis..."
+  }
+}

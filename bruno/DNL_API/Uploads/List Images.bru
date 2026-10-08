@@ -1,0 +1,16 @@
+meta {
+  name: List Images
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base_url}}/api/images/
+  body: none
+  auth: none
+}
+
+query {
+  ~product: 1
+  ~status: done
+}

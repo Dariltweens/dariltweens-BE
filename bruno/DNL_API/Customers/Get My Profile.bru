@@ -1,0 +1,15 @@
+meta {
+  name: Get My Profile
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{base_url}}/api/customers/me/
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Token {{customer_token}}
+}

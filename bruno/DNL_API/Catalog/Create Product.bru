@@ -1,0 +1,32 @@
+meta {
+  name: Create Product
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{base_url}}/api/products/
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Token {{admin_token}}
+}
+
+body:json {
+  {
+    "name": "Atlantic Salmon",
+    "description": "Premium whole fresh Atlantic Salmon.",
+    "price": "24.50",
+    "category_id": 1,
+    "attributes": {
+      "freshness": "fresh",
+      "size_range": "L",
+      "weight": 4.2,
+      "wild_caught": true
+    },
+    "stock_quantity": 45,
+    "low_stock_threshold": 10
+  }
+}

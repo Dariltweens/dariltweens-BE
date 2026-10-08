@@ -1,0 +1,21 @@
+meta {
+  name: Register Customer
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{base_url}}/api/customers/register/
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "username": "customer1",
+    "email": "customer1@example.com",
+    "password": "Password123!",
+    "phone": "+1234567891",
+    "address": "456 Ocean Drive, Shell City"
+  }
+}

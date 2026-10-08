@@ -1,0 +1,27 @@
+meta {
+  name: Create Job
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{base_url}}/api/jobs/
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Token {{admin_token}}
+}
+
+body:json {
+  {
+    "title": "Senior Logistics Coordinator",
+    "slug": "senior-logistics-coordinator",
+    "description": "We are seeking a senior coordinator to manage fresh food delivery routes...",
+    "requirements": "3+ years of cold-chain logistics experience.",
+    "location": "Main Distribution Center",
+    "employment_type": "full_time",
+    "status": "published"
+  }
+}

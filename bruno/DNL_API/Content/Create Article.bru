@@ -1,0 +1,24 @@
+meta {
+  name: Create Article
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{base_url}}/api/articles/
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Token {{admin_token}}
+}
+
+body:json {
+  {
+    "title": "Opening of our new pickup facility",
+    "slug": "opening-new-pickup-facility",
+    "content": "We are excited to announce the opening of our brand-new pickup point...",
+    "status": "draft"
+  }
+}
