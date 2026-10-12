@@ -271,10 +271,10 @@ SPECTACULAR_SETTINGS = {
 }
 
 # --- Object storage (R2) ---------------------------------------------------
-# All media is routed through core.storage.get_storage(). "fake" is the safe
-# default (in-memory) so dev/CI never touch R2; set STORAGE_BACKEND=r2 with the
-# R2_* vars in production.
-STORAGE_BACKEND = env("STORAGE_BACKEND", default="fake")
+# All media is routed through core.storage.get_storage(). R2 is the default
+# backend; set STORAGE_BACKEND=fake (and leave R2_* unset) to use the in-memory
+# backend for local dev/CI instead.
+STORAGE_BACKEND = env("STORAGE_BACKEND", default="r2")
 R2_CONFIG = {
     "ENDPOINT_URL": env("R2_ENDPOINT_URL", default=""),
     "ACCESS_KEY_ID": env("R2_ACCESS_KEY_ID", default=""),

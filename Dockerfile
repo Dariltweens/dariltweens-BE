@@ -51,9 +51,10 @@ RUN pip install --no-index --find-links=/wheels -r requirements.txt \
 
 COPY . .
 
-# Collect static assets. A build-time SECRET_KEY keeps settings importable;
-# it is never used at runtime (real value comes from the environment).
-RUN SECRET_KEY=build-time-only DEBUG=False \
+# Collect static assets. Build-time-only env vars keep settings importable
+# (collectstatic never touches the DB); real values come from the environment
+# at runtime.
+RUN SECRET_KEY=build-time-only DEBUG=False DATABASE_URL=postgres://build:build@localhost/build \
     python manage.py collectstatic --noinput
 
 RUN chown -R app:app /app
