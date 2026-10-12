@@ -12,7 +12,6 @@ htmlcov/
 .env.*
 !.env.example
 media/
-uploads/
 staticfiles/
 .DS_Store
 Dockerfile
