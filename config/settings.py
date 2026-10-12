@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # Third-party
+    "corsheaders",
     "rest_framework",
     "django_filters",
     "drf_spectacular",
@@ -62,6 +63,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -269,6 +271,14 @@ SPECTACULAR_SETTINGS = {
         "EmploymentTypeEnum": "careers.enums.EmploymentType",
     },
 }
+
+# --- CORS -------------------------------------------------------------------
+# Explicit allowlist (never CORS_ALLOW_ALL_ORIGINS — this API serves the admin
+# dashboard too). Add production frontend origin(s) via CORS_ALLOWED_ORIGINS.
+CORS_ALLOWED_ORIGINS = env.list(
+    "CORS_ALLOWED_ORIGINS", default=["http://localhost:3000"]
+)
+CORS_ALLOW_CREDENTIALS = True
 
 # --- Object storage (R2) ---------------------------------------------------
 # All media is routed through core.storage.get_storage(). R2 is the default
