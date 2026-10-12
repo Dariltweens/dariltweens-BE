@@ -57,10 +57,15 @@ COPY . .
 RUN SECRET_KEY=build-time-only DEBUG=False DATABASE_URL=postgres://build:build@localhost/build \
     python manage.py collectstatic --noinput
 
-RUN chown -R app:app /app
+RUN chmod +x entrypoint.sh && chown -R app:app /app
 USER app
 
 EXPOSE 8000
+
+# Runs migrations (gated by RUN_MIGRATIONS=true, set on the web service only —
+# not the worker, to avoid two services racing migrate on every deploy) before
+# handing off to the real command below.
+ENTRYPOINT ["./entrypoint.sh"]
 
 # Gunicorn serving the WSGI app. Shell form so $PORT (injected by Railway) is
 # expanded; falls back to 8000 locally. Override the command for the Celery
