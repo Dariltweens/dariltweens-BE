@@ -1,4 +1,5 @@
-"""Bookings enumerations and the booking state machine.
+"""
+Bookings enumerations and the booking state machine.
 
 Kept in a dependency-free leaf module so any layer can import these without
 risking circular imports. ALLOWED_TRANSITIONS is not itself an enum but is the
